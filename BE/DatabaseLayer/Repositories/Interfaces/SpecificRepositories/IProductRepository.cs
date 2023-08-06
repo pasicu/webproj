@@ -2,7 +2,7 @@
 
 namespace DatabaseLayer.Repositories.Interfaces.SpecificRepositories
 {
-    public interface IUserRepository : IGenericRepository<UserModel>
+    public interface IProductRepository : IGenericRepository<Product>
     {
     }
 }

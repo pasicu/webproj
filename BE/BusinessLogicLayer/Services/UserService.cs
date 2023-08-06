@@ -7,14 +7,9 @@ using Common.Models.Outbound;
 using DatabaseLayer.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using static Common.Constants;
 
 namespace BusinessLogicLayer.Services
@@ -29,6 +24,7 @@ namespace BusinessLogicLayer.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+
         public async Task<UserModel> CreateUser(RegisterUser incomingUser)
         {
             incomingUser.UserType = string.Concat(incomingUser.UserType[0].ToString().ToUpper(), incomingUser.UserType.Substring(1));
@@ -58,7 +54,7 @@ namespace BusinessLogicLayer.Services
             {
                 List<Claim> claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Role, user.UserType.ToString()));
-                claims.Add(new Claim("UserId", user.Id.ToString()));
+                claims.Add(new Claim("UserId", user.Id.ToString())); 
                 var token = GetNewJwtToken(claims, user.Id.ToString());
                 var logedInUser = _mapper.Map<LogedInUser>(user);
                 logedInUser.ProfilePicture = await ParseProfilePictureToString(user.ProfilePicture);
@@ -77,7 +73,7 @@ namespace BusinessLogicLayer.Services
             var existingUser = await _unitOfWork.Users.FindAsync(u => u.Id.Equals(new Guid(userId)));
             if (existingUser != null)
             {
-                var userr = await GetExistingFacebookUser(existingUser); // DELETE AFTER CHECK 
+                var userr = await GetExistingFacebookUser(existingUser); // DELETE AFTER CHECK
                 return await GetExistingFacebookUser(existingUser);
             }
             else
@@ -87,11 +83,40 @@ namespace BusinessLogicLayer.Services
             }
         }
 
+        public async Task<LogedInUser> UpdateUser(UpdateUser user)
+        {
+            var userCurrentValues = await _unitOfWork.Users.FindAsync(u => u.Username == user.Username);
+            var userUpdatedValues = _mapper.Map<UserModel>(user);
+            userUpdatedValues.Id = userCurrentValues.Id;
+            userUpdatedValues.Username = userCurrentValues.Username;
+            userUpdatedValues.Password = userCurrentValues.Password;
+            userUpdatedValues.UserType = userCurrentValues.UserType;
+            userUpdatedValues.Verified = userCurrentValues.Verified;
+
+            if (user.ProfilePicture != null)
+                userUpdatedValues.ProfilePicture = await ParseProfilePictureToBytes(user.ProfilePicture);
+            else
+                userUpdatedValues.ProfilePicture = userCurrentValues.ProfilePicture;
+
+            await _unitOfWork.Users.Update(userUpdatedValues, userUpdatedValues.Id);
+            await _unitOfWork.SaveChanges();
+
+            var updatedUser = _mapper.Map<LogedInUser>(userUpdatedValues);
+            if (userCurrentValues.Id.ToString().Contains("0000"))
+                updatedUser.ProfilePicture = Encoding.ASCII.GetString(userUpdatedValues.ProfilePicture);
+            else
+                updatedUser.ProfilePicture = await ParseProfilePictureToString(userUpdatedValues.ProfilePicture);
+
+            return updatedUser;
+        }
+
+        #region private methods
+
         private async Task<LogedInUser> GetExistingFacebookUser(UserModel existingUser)
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Role, existingUser.UserType.ToString()));
-            claims.Add(new Claim("UserId", existingUser.Id.ToString()));
+            claims.Add(new Claim("UserId", existingUser.Id.ToString())); 
             var token = GetNewJwtToken(claims, existingUser.Id.ToString());
             var logedInUser = _mapper.Map<LogedInUser>(existingUser);
             logedInUser.ProfilePicture = existingUser.ProfilePicture == null ? null : Encoding.ASCII.GetString(existingUser.ProfilePicture);
@@ -140,13 +165,14 @@ namespace BusinessLogicLayer.Services
 
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Role, user.UserType.ToString()));
-            claims.Add(new Claim("UserId", user.Id.ToString()));
+            claims.Add(new Claim("UserId", user.Id.ToString())); 
             var token = GetNewJwtToken(claims, user.Id.ToString());
             var logedInUser = _mapper.Map<LogedInUser>(user);
             logedInUser.ProfilePicture = user.ProfilePicture == null ? null : Encoding.ASCII.GetString(user.ProfilePicture);
             logedInUser.Token = token;
             return logedInUser;
         }
+
         private async Task<string> GetUsernameForFacebookUser(string fullname)
         {
             string[] names = fullname.Split(' ');
@@ -167,6 +193,7 @@ namespace BusinessLogicLayer.Services
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
+
         private async Task<byte[]> ParseProfilePictureToBytes(IFormFile incomingPicture)
         {
             byte[] bytePicture;
@@ -188,19 +215,21 @@ namespace BusinessLogicLayer.Services
             SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SECRET_KEY_VALUE));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokenOptions = new JwtSecurityToken(
-                issuer: "http://localhost:7264",
+                issuer: "http://localhost:7232",
                 claims: userClaims,
                 expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: signingCredentials);
             string stringToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             return stringToken;
         }
+
         private async Task<string> ParseProfilePictureToString(byte[] picture)
         {
             if (picture == null)
                 return null;
             return $"data:image/jpg;base64,{Convert.ToBase64String(picture)}";
         }
+
         private Task<string> GetUserIdForFacebookUser(string facebookId)
         {
             StringBuilder sb = new StringBuilder();
@@ -216,5 +245,6 @@ namespace BusinessLogicLayer.Services
             return Task.FromResult(sb.ToString());
         }
 
+        #endregion private methods
     }
 }

@@ -1,6 +1,9 @@
 ﻿using BusinessLogicLayer.Contracts;
+using Common.Models.Database;
 using Common.Models.Inbound;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,8 +19,9 @@ namespace ControllerLayer.Controllers
         {
             _userService = userService;
         }
+
         [HttpPost]
-        public async Task<ActionResult> User([FromForm] RegisterUser user)
+        public async Task<ActionResult> Users([FromForm] RegisterUser user)
         {
             return Ok(await _userService.CreateUser(user));
         }
@@ -28,12 +32,20 @@ namespace ControllerLayer.Controllers
         {
             return Ok(await _userService.Login(user.Username, user.Password));
         }
+         
 
         [HttpPost]
         [Route("facebooklogin")]
         public async Task<ActionResult> FacebookLogin(FacebookLoginUser user)
         {
             return Ok(await _userService.FacebookLogin(user));
+        }
+
+        [HttpPut]
+        [Route("users/{username}/update")]
+        public async Task<ActionResult> Update([FromForm] UpdateUser user)
+        {
+            return Ok(await _userService.UpdateUser(user));
         }
     }
 }

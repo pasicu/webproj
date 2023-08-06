@@ -107,3 +107,51 @@ export const RegisterUser = async (username,
         return ex.response;
     }
 }
+
+export const UpdateProfile = async (
+    username,
+    name, 
+    lastname,
+    email,
+    dateOfBirth,
+    adress,
+    profilePicture,
+    handleAlert
+) =>
+{
+    
+
+    try{   
+        if(name === "" || email === "" || lastname === "" || dateOfBirth === "" || adress === "")
+        {
+            handleAlert("You can't delete your info, you can only change it.", "error");
+            return;
+        }
+
+        const formData = new FormData(); 
+        formData.append("username", username);
+        formData.append("email", email); 
+        formData.append("name", name);
+        formData.append("lastname", lastname);
+        formData.append("dateOfBirth", dateOfBirth);
+        formData.append("adress", adress); 
+        formData.append("profilePicture", profilePicture);
+
+
+
+        const response = await axios.put(
+            `${process.env.REACT_APP_API_BASE_URL}/api/User/users/${username}/update`, 
+            formData);
+        const { token, ...logedInUser } = response.data;
+        handleAlert("Successfully updated your profile.", "success");
+        localStorage.setItem("logedInUser", JSON.stringify(logedInUser));
+        return response;
+    }
+    catch(ex)
+    {
+        console.error(ex);
+        console.error("Error while trying to update: ", ex.response.data.message);
+        handleAlert(ex.response.data.message, "error");
+        return ex.response;
+    }
+}

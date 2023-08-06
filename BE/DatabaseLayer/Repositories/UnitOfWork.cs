@@ -1,10 +1,5 @@
-﻿using DatabaseLayer.Repositories.Interfaces.SpecificRepositories;
-using DatabaseLayer.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DatabaseLayer.Repositories.Interfaces;
+using DatabaseLayer.Repositories.Interfaces.SpecificRepositories;
 
 namespace DatabaseLayer.Repositories
 {
@@ -12,12 +7,15 @@ namespace DatabaseLayer.Repositories
     {
         private readonly DbContextClass _dbContext;
         public IUserRepository Users { get; }
+        public IProductRepository Products { get; }
 
         public UnitOfWork(DbContextClass dbContext,
-                            IUserRepository users)
+                            IUserRepository users,
+                            IProductRepository products)
         {
             _dbContext = dbContext;
             Users = users;
+            Products = products;
         }
 
         public async Task<int> SaveChanges()

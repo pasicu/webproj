@@ -3,9 +3,9 @@ using DatabaseLayer.Repositories.Interfaces.SpecificRepositories;
 
 namespace DatabaseLayer.Repositories
 {
-    public class UserRepository : GenericRepository<UserModel>, IUserRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
-        public UserRepository(DbContextClass dbContext) : base(dbContext)
+        public ProductRepository(DbContextClass dbContext) : base(dbContext)
         {
         }
     }

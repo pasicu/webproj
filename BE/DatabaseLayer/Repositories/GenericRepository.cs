@@ -1,11 +1,6 @@
 ﻿using DatabaseLayer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DatabaseLayer.Repositories
 {
@@ -43,9 +38,11 @@ namespace DatabaseLayer.Repositories
             return await _dbContext.Set<T>().FindAsync(id);
         }
 
-        public void Update(T entity)
+        public async Task<T> Update(T entity, object id)
         {
-            _dbContext.Set<T>().Update(entity);
+            T currentEntity = await _dbContext.Set<T>().FindAsync(id);
+            _dbContext.Entry(currentEntity).CurrentValues.SetValues(entity);
+            return await _dbContext.Set<T>().FindAsync(id);
         }
     }
 }
