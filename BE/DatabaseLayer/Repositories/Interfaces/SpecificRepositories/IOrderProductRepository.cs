@@ -1,7 +1,7 @@
 ﻿using Common.Models.Database;
 using DatabaseLayer.Repositories.Interfaces;
 
-namespace ShopManagement.Database.Repositories.Contracts
+namespace DatabaseLayer.Repositories.Interfaces.SpecificRepositories
 {
     public interface IOrderProductRepository : IGenericRepository<OrderProduct>
     {

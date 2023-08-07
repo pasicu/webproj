@@ -24,6 +24,12 @@ export const Login = () => {
         await LogIn(username, password, handleAlert, navigate);            
     }
 
+    useEffect( () => {
+        const logedInUser = localStorage.getItem("logedInUser");
+        if(logedInUser)
+            navigate("/my-profile");
+    }, [navigate]);
+
     const responseFacebook = async (response) => {
         console.log("login result", response); 
         if(response.error != undefined)

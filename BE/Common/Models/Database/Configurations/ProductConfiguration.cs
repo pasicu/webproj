@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ShopManagement.Common.Models.DataBase.Configurations
+namespace Common.Models.Database.Configurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {

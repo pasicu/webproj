@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ShopManagement.Common.Models.Database.Configurations
+namespace Common.Models.Database.Configurations
 {
     public class OrderConfiguration : IEntityTypeConfiguration<Order>
     {

@@ -7,6 +7,8 @@ import { MyProfile } from './components/MyProfile';
 import { PrivateRoute } from "./components/PrivateRoutes";
 import { MyProducts } from './components/sellerCommands/MyProducts';
 import { AddNewProduct } from './components/sellerCommands/AddNewProduct';
+import { NewOrder } from './components/buyerCommands/NewOrder';
+import { UpdateProductForm } from './components/sellerCommands/UpdateProduct';
 
 function App() {
   return (
@@ -30,7 +32,15 @@ function App() {
         <Route path="/add-new-product"
                 element={<PrivateRoute
                           allowedRoles={["Seller"]}
-                          component={AddNewProduct}/> }/>                           
+                          component={AddNewProduct}/> }/> 
+        <Route path="/update-product"
+                element={<PrivateRoute
+                          allowedRoles={["Seller"]}
+                          component={UpdateProductForm}/> }/>         
+        <Route path="/new-order"
+                element={<PrivateRoute
+                          allowedRoles={["Buyer"]}
+                          component={NewOrder}/> }/>                    
       </Routes>
     </>
   );

@@ -22,7 +22,7 @@ export const GetSellersProducts = async (handleAllert, token) =>
 export const GetAllProducts = async (handleAlert, token) =>
 {
     try{
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/products`,
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/product`,
         {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -41,7 +41,7 @@ export const GetAllProducts = async (handleAlert, token) =>
 export const DeleteProduct = async (handleAllert, token, productId) =>
 {
     try{
-        const response = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/delete`,
+        const response = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/Product/products/${productId}/delete`,
         {
             headers: {
                 Authorization : `Bearer ${token}`
@@ -127,7 +127,7 @@ export const UpdateProduct = async (handleAlert,
             formData.append("updatedImage", updatedImage);
         }
 
-        const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/products/${id}/update`,
+        const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/Product/products/${id}/update`,
             formData,
             {
             headers: {

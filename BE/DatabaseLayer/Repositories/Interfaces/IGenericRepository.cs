@@ -10,7 +10,7 @@ namespace DatabaseLayer.Repositories.Interfaces
 
         Task Add(T entity);
 
-        void Delete(T entity);
+        Task<T> Delete(T entity);
 
         Task<T> Update(T entity, object id);
 

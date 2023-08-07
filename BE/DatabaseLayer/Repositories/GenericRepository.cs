@@ -18,9 +18,10 @@ namespace DatabaseLayer.Repositories
             await _dbContext.Set<T>().AddAsync(entity);
         }
 
-        public void Delete(T entity)
+        public async Task<T> Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
+            return entity;
         }
 
         public async Task<T?> FindAsync(Expression<Func<T, bool>> filter)

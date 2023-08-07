@@ -8,14 +8,17 @@ namespace DatabaseLayer.Repositories
         private readonly DbContextClass _dbContext;
         public IUserRepository Users { get; }
         public IProductRepository Products { get; }
+        public IOrderRepository Orders { get; }
 
         public UnitOfWork(DbContextClass dbContext,
                             IUserRepository users,
-                            IProductRepository products)
+                            IProductRepository products,
+                            IOrderRepository orders)
         {
             _dbContext = dbContext;
             Users = users;
             Products = products;
+            Orders = orders;
         }
 
         public async Task<int> SaveChanges()

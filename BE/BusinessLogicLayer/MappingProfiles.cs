@@ -33,6 +33,17 @@ namespace BusinessLogicLayer
             CreateMap<Product, ProductView>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image == null ? null : $"data:image/jpg;base64,{Convert.ToBase64String(src.Image)}"));
 
+            CreateMap<UpdateProduct, Product>()
+                .ForMember(dest => dest.Image, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => new Guid(src.ProductId)));
+
+            CreateMap<NewOrder, Order>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.OrderDeclinedd, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.OrderedAt, opt => opt.MapFrom(src => DateTime.Now))
+                .ForMember(dest => dest.OrderProducts, opt => opt.MapFrom(src => new List<OrderProduct>()));
+
+            
         }
     }
 }

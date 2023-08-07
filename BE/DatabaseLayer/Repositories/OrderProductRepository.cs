@@ -1,9 +1,8 @@
 ﻿using Common.Models.Database;
 using DatabaseLayer;
-using DatabaseLayer.Repositories;
-using ShopManagement.Database.Repositories.Contracts;
+using DatabaseLayer.Repositories.Interfaces.SpecificRepositories;
 
-namespace ShopManagement.Database.Repositories
+namespace DatabaseLayer.Repositories
 {
     public class OrderProductRepository : GenericRepository<OrderProduct>, IOrderProductRepository
     {

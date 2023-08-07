@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace UserManagement.Common.Models.DataBase.Configurations
+namespace Common.Models.Database.Configurations
 {
     public class UserConfiguration : IEntityTypeConfiguration<UserModel>
     {
