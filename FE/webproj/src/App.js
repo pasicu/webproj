@@ -9,6 +9,10 @@ import { MyProducts } from './components/sellerCommands/MyProducts';
 import { AddNewProduct } from './components/sellerCommands/AddNewProduct';
 import { NewOrder } from './components/buyerCommands/NewOrder';
 import { UpdateProductForm } from './components/sellerCommands/UpdateProduct';
+import { OldOrders } from './components/buyerCommands/OldOrders';
+import { OrderDetails } from './components/buyerCommands/OrderDetails';
+import { NewOrders } from './components/sellerCommands/NewOrders';
+
 
 function App() {
   return (
@@ -40,7 +44,19 @@ function App() {
         <Route path="/new-order"
                 element={<PrivateRoute
                           allowedRoles={["Buyer"]}
-                          component={NewOrder}/> }/>                    
+                          component={NewOrder}/> }/> 
+        <Route path="/old-orders"
+                element={<PrivateRoute
+                          allowedRoles={["Buyer"]}
+                          component={OldOrders}/> }/>
+        <Route path="/order-details"
+                element={<PrivateRoute
+                          allowedRoles={["Buyer", "Admin", "Seller"]}
+                          component={OrderDetails}/> }/> 
+        <Route path="/new-orders"
+                element={<PrivateRoute
+                          allowedRoles={["Seller"]}
+                          component={NewOrders}/> }/>                                      
       </Routes>
     </>
   );

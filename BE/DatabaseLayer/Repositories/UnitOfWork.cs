@@ -10,15 +10,19 @@ namespace DatabaseLayer.Repositories
         public IProductRepository Products { get; }
         public IOrderRepository Orders { get; }
 
+        public IOrderProductRepository OrderProducts { get; }
+
         public UnitOfWork(DbContextClass dbContext,
                             IUserRepository users,
                             IProductRepository products,
-                            IOrderRepository orders)
+                            IOrderRepository orders,
+                            IOrderProductRepository orderProducts)
         {
             _dbContext = dbContext;
             Users = users;
             Products = products;
             Orders = orders;
+            OrderProducts = orderProducts;
         }
 
         public async Task<int> SaveChanges()

@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Contracts;
 using Common.Models.Database;
 using Common.Models.Inbound;
+using Common.Models.Outbound;
 using DatabaseLayer.Repositories.Interfaces;
 using Microsoft.AspNetCore.Components.Web;
 using static Common.Constants;
@@ -19,25 +20,25 @@ namespace BusinessLogicLayer.Services
             _unitOfWork = unitOfWork; 
         }
 
-        //public async Task<bool> CancelOrder(CancelOrder order)
-        //{
-        //    var existingOrder = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(order.OrderId.ToLower()));
-        //    if(existingOrder == null || existingOrder.OrderDeclinedd == true || !existingOrder.UserId.ToLower().Equals(order.UserId.ToLower()) || existingOrder.OrderedAt.AddHours(1) < DateTime.Now)
-        //    {
-        //        return false;
-        //    }
-        //    existingOrder.OrderDeclinedd = true;
+        public async Task<bool> CancelOrder(CancelOrder order)
+        {
+            var existingOrder = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(order.OrderId.ToLower()));
+            if (existingOrder == null || existingOrder.OrderDeclinedd == true || !existingOrder.UserId.ToLower().Equals(order.UserId.ToLower()) || existingOrder.OrderedAt.AddHours(1) < DateTime.Now)
+            {
+                return false;
+            }
+            existingOrder.OrderDeclinedd = true;
 
-        //    var orderProductsList = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.OrderId.ToLower()));
-        //    foreach (var oneOrderProduct in orderProductsList)
-        //    {
-        //        var product = await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(oneOrderProduct.ProductId.ToString().ToLower()));
-        //        product.Quantity += oneOrderProduct.ProductQuantity;
-        //    }
-        //    await _unitOfWork.SaveChanges();
-        //    return true;
+            var orderProductsList = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.OrderId.ToLower()));
+            foreach (var oneOrderProduct in orderProductsList)
+            {
+                var product = await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(oneOrderProduct.ProductId.ToString().ToLower()));
+                product.Quantity += oneOrderProduct.ProductQuantity;
+            }
+            await _unitOfWork.SaveChanges();
+            return true;
 
-        //}
+        }
 
         public async Task<Order> CreateNewOrder(NewOrder order)
         {
@@ -85,21 +86,21 @@ namespace BusinessLogicLayer.Services
             return databaseOrder;
         }
 
-        //public async Task<List<OrderView>> GetAllByBuyerId(string userId)
-        //{ 
-        //    var usersOrders = (await _unitOfWork.Orders.GetAll()).Where(o => o.UserId.ToLower().Equals(userId.ToLower())).ToList();
-        //    var mappedUserOrders = _mapper.Map<List<OrderView>>(usersOrders);
-        //    foreach (var order in mappedUserOrders)
-        //    {
-        //        var productsInOrder = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToLower()));
-        //        foreach (var differentProduct in productsInOrder)
-        //        {
-        //            order.NumberOfProducts += differentProduct.ProductQuantity;
-        //        }
+        public async Task<List<OrderView>> GetAllByBuyerId(string userId)
+        {
+            var usersOrders = (await _unitOfWork.Orders.GetAll()).Where(o => o.UserId.ToLower().Equals(userId.ToLower())).ToList();
+            var mappedUserOrders = _mapper.Map<List<OrderView>>(usersOrders);
+            foreach (var order in mappedUserOrders)
+            {
+                var productsInOrder = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToLower()));
+                foreach (var differentProduct in productsInOrder)
+                {
+                    order.NumberOfProducts += differentProduct.ProductQuantity;
+                }
 
-        //    }
-        //    return mappedUserOrders;
-        //}
+            }
+            return mappedUserOrders;
+        }
 
         //public async Task<List<OrderView>> GetAllOrders()
         //{
@@ -117,54 +118,54 @@ namespace BusinessLogicLayer.Services
         //    return mappedOrders;
         //}
 
-        //public async Task<List<OrderView>> GetAllOrdersForSeller(string userId)
-        //{   //sadrzi product id-eve ovog prodavca
-        //    List<string> usersProductsIds = (await _unitOfWork.Products.GetAll()).Where(p => p.SellerId.ToString().ToLower().Equals(userId.ToLower())).Select(p => p.Id.ToString()).ToList();
+        public async Task<List<OrderView>> GetAllOrdersForSeller(string userId)
+        {   //sadrzi product id-eve ovog prodavca
+            List<string> usersProductsIds = (await _unitOfWork.Products.GetAll()).Where(p => p.SellerId.ToString().ToLower().Equals(userId.ToLower())).Select(p => p.Id.ToString()).ToList();
 
-        //    //sadrzi orderproduct-e gde su proizvodi ovog prodavca
-        //    List<OrderProduct> orderProducts = new List<OrderProduct>();
-        //    List<OrderProduct> allOrderProducts = (await _unitOfWork.OrderProducts.GetAll()).ToList();
-        //    foreach (var productId in usersProductsIds)
-        //    {
-        //        foreach (var orderProduct in allOrderProducts)
-        //        {
-        //            if (orderProduct.ProductId.ToString().ToLower().Equals(productId.ToLower()))
-        //                orderProducts.Add(orderProduct);
-        //        }
-        //    }
+            //sadrzi orderproduct-e gde su proizvodi ovog prodavca
+            List<OrderProduct> orderProducts = new List<OrderProduct>();
+            List<OrderProduct> allOrderProducts = (await _unitOfWork.OrderProducts.GetAll()).ToList();
+            foreach (var productId in usersProductsIds)
+            {
+                foreach (var orderProduct in allOrderProducts)
+                {
+                    if (orderProduct.ProductId.ToString().ToLower().Equals(productId.ToLower()))
+                        orderProducts.Add(orderProduct);
+                }
+            }
 
-        //    //sadrzi ordere gde su proizvodi ovog prodavca *napomena total price nije adekvatan jer mogu se naci tudji proizvodi
-        //    HashSet<Order> sellerOrders = new HashSet<Order>();
-        //    foreach (var orderProduct in orderProducts)
-        //    {
-        //        sellerOrders.Add(await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderProduct.OrderId.ToString().ToLower())));
-        //    }
+            //sadrzi ordere gde su proizvodi ovog prodavca *napomena total price nije adekvatan jer mogu se naci tudji proizvodi
+            HashSet<Order> sellerOrders = new HashSet<Order>();
+            foreach (var orderProduct in orderProducts)
+            {
+                sellerOrders.Add(await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderProduct.OrderId.ToString().ToLower())));
+            }
 
-        //    List<OrderView> addaptedOrders = _mapper.Map<List<OrderView>>(sellerOrders);
-        //    foreach (var adOrder in addaptedOrders)
-        //    {
-        //        adOrder.NumberOfProducts = 0;
-        //        adOrder.TotalPrice = 0;
-        //        foreach (var orderProduct in orderProducts)
-        //        {
-        //            if (adOrder.Id.ToLower().Equals(orderProduct.OrderId.ToString().ToLower()))
-        //            {
-        //                adOrder.NumberOfProducts += orderProduct.ProductQuantity;
-        //                adOrder.TotalPrice += orderProduct.ProductQuantity * (await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower()))).Price;
-        //            }
-        //        }
-        //    }
+            List<OrderView> addaptedOrders = _mapper.Map<List<OrderView>>(sellerOrders);
+            foreach (var adOrder in addaptedOrders)
+            {
+                adOrder.NumberOfProducts = 0;
+                adOrder.TotalPrice = 0;
+                foreach (var orderProduct in orderProducts)
+                {
+                    if (adOrder.Id.ToLower().Equals(orderProduct.OrderId.ToString().ToLower()))
+                    {
+                        adOrder.NumberOfProducts += orderProduct.ProductQuantity;
+                        adOrder.TotalPrice += orderProduct.ProductQuantity * (await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower()))).Price;
+                    }
+                }
+            }
 
-        //    return addaptedOrders;
+            return addaptedOrders;
 
-        //}
+        }
 
-        //public async Task<List<OrderView>> GetNewOrdersForSeller(string userId)
-        //{
-        //    var allOrders = await GetAllOrdersForSeller(userId);
-        //    var newOrders = allOrders.Where(o => DateTime.Parse(o.OrderedAt).AddHours(1) > DateTime.Now && o.OrderCanceled == false).ToList(); 
-        //    return newOrders;
-        //}
+        public async Task<List<OrderView>> GetNewOrdersForSeller(string userId)
+        {
+            var allOrders = await GetAllOrdersForSeller(userId);
+            var newOrders = allOrders.Where(o => DateTime.Parse(o.OrderedAt).AddHours(1) > DateTime.Now && o.OrderCanceled == false).ToList();
+            return newOrders;
+        }
 
 
         //public async Task<List<OrderView>> GetMyOrdersForSeller(string userId)
@@ -174,78 +175,78 @@ namespace BusinessLogicLayer.Services
         //    return oldOrders;
         //}
 
-        //public async Task<OrderDetailsView> SellerOrderDetails(OrderDetailsInbound orderDetailsInbound)
-        //{
-        //    var order = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderDetailsInbound.OrderId));
-        //    List<string> usersProductsIds = (await _unitOfWork.Products.GetAll()).Where(p => p.SellerId.ToString().ToLower().Equals(orderDetailsInbound.UserId.ToLower())).Select(p => p.Id.ToString()).ToList();
-        //    //sadrzi orderproduct-e gde su proizvodi ovog prodavca
-        //    List<OrderProduct> orderProducts = new List<OrderProduct>();
-        //    List<OrderProduct> allOrderProducts = (await _unitOfWork.OrderProducts.GetAll()).ToList();
-        //    foreach (var productId in usersProductsIds)
-        //    {
-        //        foreach (var orderProduct in allOrderProducts)
-        //        {
-        //            if (orderProduct.ProductId.ToString().ToLower().Equals(productId.ToLower()) && orderProduct.OrderId.ToString().ToLower().Equals(orderDetailsInbound.OrderId.ToLower()))
-        //                orderProducts.Add(orderProduct);
-        //        }
-        //    }
+        public async Task<OrderDetailsView> SellerOrderDetails(OrderDetailsInbound orderDetailsInbound)
+        {
+            var order = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderDetailsInbound.OrderId));
+            List<string> usersProductsIds = (await _unitOfWork.Products.GetAll()).Where(p => p.SellerId.ToString().ToLower().Equals(orderDetailsInbound.UserId.ToLower())).Select(p => p.Id.ToString()).ToList();
+            //sadrzi orderproduct-e gde su proizvodi ovog prodavca
+            List<OrderProduct> orderProducts = new List<OrderProduct>();
+            List<OrderProduct> allOrderProducts = (await _unitOfWork.OrderProducts.GetAll()).ToList();
+            foreach (var productId in usersProductsIds)
+            {
+                foreach (var orderProduct in allOrderProducts)
+                {
+                    if (orderProduct.ProductId.ToString().ToLower().Equals(productId.ToLower()) && orderProduct.OrderId.ToString().ToLower().Equals(orderDetailsInbound.OrderId.ToLower()))
+                        orderProducts.Add(orderProduct);
+                }
+            }
 
-        //    //sad order details view dodajemo adekvatnu listu produkta za taj order, ali samo od ovog prodavca
-        //    List<ProductView> products = new List<ProductView>();
-        //    foreach (var orderProduct in orderProducts)
-        //    {
-        //        var productToAdd = _mapper.Map<ProductView>(await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower())));
-        //        productToAdd.Quantity = orderProduct.ProductQuantity;
-        //        products.Add(productToAdd);
-        //    }
+            //sad order details view dodajemo adekvatnu listu produkta za taj order, ali samo od ovog prodavca
+            List<ProductView> products = new List<ProductView>();
+            foreach (var orderProduct in orderProducts)
+            {
+                var productToAdd = _mapper.Map<ProductView>(await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower())));
+                productToAdd.Quantity = orderProduct.ProductQuantity;
+                products.Add(productToAdd);
+            }
 
-        //    var adOrder = _mapper.Map<OrderView>(order);
+            var adOrder = _mapper.Map<OrderView>(order);
 
-        //    adOrder.TotalPrice = 0;
-        //    foreach (var orderProduct in orderProducts)
-        //    {
-        //        if (adOrder.Id.ToLower().Equals(orderProduct.OrderId.ToString().ToLower()))
-        //        { 
-        //            adOrder.TotalPrice += orderProduct.ProductQuantity * (await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower()))).Price;
-        //        }
-        //    }
+            adOrder.TotalPrice = 0;
+            foreach (var orderProduct in orderProducts)
+            {
+                if (adOrder.Id.ToLower().Equals(orderProduct.OrderId.ToString().ToLower()))
+                {
+                    adOrder.TotalPrice += orderProduct.ProductQuantity * (await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(orderProduct.ProductId.ToString().ToLower()))).Price;
+                }
+            }
 
-        //    OrderDetailsView returnValue = new OrderDetailsView()
-        //    {
-        //        Address = order.DeliveryAddress,
-        //        Comment = order.Comment,
-        //        DeliveringTime = order.DeliveringTime.ToString(),
-        //        IsCanceled = order.OrderDeclinedd,
-        //        OrderedAt = order.OrderedAt.ToString(),
-        //        TotalPrice = adOrder.TotalPrice,
-        //        Products = products
-        //    };
-        //    return returnValue;
-        //}
+            OrderDetailsView returnValue = new OrderDetailsView()
+            {
+                Address = order.DeliveryAddress,
+                Comment = order.Comment,
+                DeliveringTime = order.DeliveringTime.ToString(),
+                IsCanceled = order.OrderDeclinedd,
+                OrderedAt = order.OrderedAt.ToString(),
+                TotalPrice = adOrder.TotalPrice,
+                Products = products
+            };
+            return returnValue;
+        }
 
-        //public async Task<OrderDetailsView> OrderDetails(OrderDetailsInbound orderDetailsInbound)
-        //{
-        //    var order = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderDetailsInbound.OrderId));
-        //    var productIds = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToString().ToLower()));
-        //    List<ProductView> products = new List<ProductView>();
-        //    foreach (var product in productIds)
-        //    {
-        //        var productToAdd = _mapper.Map<ProductView>(await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(product.ProductId.ToString().ToLower())));
-        //        productToAdd.Quantity = product.ProductQuantity;
-        //        products.Add(productToAdd);
-        //    }
-        //    OrderDetailsView returnValue = new OrderDetailsView()
-        //    {
-        //        Address = order.DeliveryAddress,
-        //        Comment = order.Comment,
-        //        DeliveringTime = order.DeliveringTime.ToString(),
-        //        IsCanceled = order.OrderDeclinedd,
-        //        OrderedAt = order.OrderedAt.ToString(),
-        //        TotalPrice = order.TotalPrice,
-        //        Products = products
-        //    };
-        //    return returnValue;
-        //}
+        public async Task<OrderDetailsView> OrderDetails(OrderDetailsInbound orderDetailsInbound)
+        {
+            var order = await _unitOfWork.Orders.FindAsync(o => o.Id.ToString().ToLower().Equals(orderDetailsInbound.OrderId));
+            var productIds = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToString().ToLower()));
+            List<ProductView> products = new List<ProductView>();
+            foreach (var product in productIds)
+            {
+                var productToAdd = _mapper.Map<ProductView>(await _unitOfWork.Products.FindAsync(p => p.Id.ToString().ToLower().Equals(product.ProductId.ToString().ToLower())));
+                productToAdd.Quantity = product.ProductQuantity;
+                products.Add(productToAdd);
+            }
+            OrderDetailsView returnValue = new OrderDetailsView()
+            {
+                Address = order.DeliveryAddress,
+                Comment = order.Comment,
+                DeliveringTime = order.DeliveringTime.ToString(),
+                IsCanceled = order.OrderDeclinedd,
+                OrderedAt = order.OrderedAt.ToString(),
+                TotalPrice = order.TotalPrice,
+                Products = products
+            };
+            return returnValue;
+        }
 
 
         #region private helper methods

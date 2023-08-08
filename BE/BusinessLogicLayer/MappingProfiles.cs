@@ -43,7 +43,9 @@ namespace BusinessLogicLayer
                 .ForMember(dest => dest.OrderedAt, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.OrderProducts, opt => opt.MapFrom(src => new List<OrderProduct>()));
 
-            
+            CreateMap<Order, OrderView>()
+               .ForMember(dest => dest.NumberOfProducts, opt => opt.MapFrom(src => 0))
+               .ForMember(dest => dest.OrderCanceled, opt => opt.MapFrom(src => src.OrderDeclinedd));
         }
     }
 }
