@@ -37,6 +37,25 @@ export const PlaceNewOrder = async(productIds, comment, deliveryAddress, token, 
     }
 }
 
+export const GetAllOrders = async(handleAlert, token) =>
+{
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/Order`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    }
+    catch(ex)
+    {
+        console.error("Error while trying to get buyers orders: ", ex.response);
+        handleAlert(ex.response, "error");
+        return ex.response;
+    }
+}
+
 export const GetBuyersOrders = async (handleAlert, token) =>
 {
     try{
@@ -171,6 +190,25 @@ export const GetSellersNewOrders =  async (handleAlert, token) => {
     catch(ex)
     {
         console.error("Error while trying to get seller's new orders: ", ex);
+        handleAlert(ex.response, "error");
+        return ex.response;
+    }
+}
+
+export const GetSellersOldOrders = async (handleAlert, token) => {
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/Order/seller/my-orders`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    }
+    catch(ex)
+    {
+        console.error("Error while trying to get seller's old orders: ", ex);
         handleAlert(ex.response, "error");
         return ex.response;
     }

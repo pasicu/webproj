@@ -23,8 +23,8 @@ export const LogIn = async (username, password, handleAlert, navigate) =>
     }
     catch(ex)
     {
-        console.error("Error while trying to log in: ", ex.response.data.message);
-        handleAlert(ex.response.data.message, "error");
+        console.error("Error while trying to log in: ", ex.response.data);
+        handleAlert("There is no user with this username and password.", "error");
         return ex.response;
     }
 }
@@ -152,6 +152,47 @@ export const UpdateProfile = async (
         console.error(ex);
         console.error("Error while trying to update: ", ex.response.data.message);
         handleAlert(ex.response.data.message, "error");
+        return ex.response;
+    }
+}
+
+export const GetAllSellers = async (handleAlert, token) =>
+{
+    try{
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/User/users/sellers`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    }
+    catch(ex)
+    {
+        console.error("Error while trying to get list of sellers: ", ex.response.data.message);
+        handleAlert(ex.response.data.message, "error");
+        return ex.response;
+    }
+}
+
+export const VerifySeller = async (username, value, token, handleAlert) => 
+{
+    try{
+        const response = await axios.patch(`${process.env.REACT_APP_API_BASE_URL}/api/User/users/${username}/verify`,
+        {
+            username,value
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+    }
+    catch(ex)
+    {
+        handleAlert(ex.response.data.message, "error");
+        console.error(ex.response);
         return ex.response;
     }
 }

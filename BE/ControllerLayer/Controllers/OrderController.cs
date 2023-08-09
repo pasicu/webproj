@@ -72,5 +72,22 @@ namespace ControllerLayer.Controllers
             return Ok(await _orderService.SellerOrderDetails(order));
         }
 
+        [HttpGet]
+        [Route("seller/my-orders")]
+        [Authorize(Roles = "Seller")]
+        public async Task<ActionResult> GetSellersOrders()
+        {
+            var userId = User.FindFirst("UserId").Value;
+            return Ok(await _orderService.GetMyOrdersForSeller(userId));
+        }
+
+        [HttpGet]
+        [Route("")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetAllOrders()
+        {
+            return Ok(await _orderService.GetAllOrders());
+        }
+
     }
 }

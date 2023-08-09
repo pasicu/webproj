@@ -7,7 +7,7 @@ body {
   min-height: 100vh;
   align-items: center;
   justify-content: center;
-  background-image: linear-gradient(79deg, #3cd0ea, #18c287 58%, #ffffff);
+  background-image: linear-gradient(79deg, #3cd0ea, #373553 85%, #ffffff);
 }
  
 .auth-form-container, .update-product-form, .login-form, .register-form, .dashboard-container, .add-new-product-form, .place-new-order-form {
@@ -44,12 +44,12 @@ button {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  color:#2fad05;
+  color:#0a92b4;
 }
 
 .dashboard-button {
   box-shadow:inset -2px 0px 12px -2px #ffffff;
-	background-color:#18c287;
+	background-color:#70ddf0;
 	border:1px solid #ffffff;
 	display:inline-block;
 	cursor:pointer;
@@ -63,7 +63,7 @@ button {
 }
 
 .dashboard-button:hover{
-  background-color:#67ea3c;
+  background-color:#0eaeca;
 }
 
 .dashboard-button:active{
@@ -151,7 +151,7 @@ select {
 
 .add-new-product-button:hover { 
   color:white;
-  background-color:#67ea3c;
+  background-color:#0eaeca;
 }
 
 .place-new-order-form {
@@ -172,7 +172,7 @@ select {
 
 .back-to-dashboard-button:hover {
   color: white;
-  background-color: #67ea3c;
+  background-color: #0eaeca;
   border:1px solid white;
 }
 
@@ -186,6 +186,6 @@ select {
 .log-out-button:hover {
   border:1px solid white;
   color: white;
-  background-color: #67ea3c;
+  background-color: #0eaeca;
 }
  

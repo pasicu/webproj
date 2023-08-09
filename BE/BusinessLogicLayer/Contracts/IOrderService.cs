@@ -12,7 +12,7 @@ namespace BusinessLogicLayer.Contracts
         Task<OrderDetailsView> OrderDetails(OrderDetailsInbound orderDetailsInbound);
         Task<OrderDetailsView> SellerOrderDetails(OrderDetailsInbound orderDetailsInbound);
         Task<List<OrderView>> GetNewOrdersForSeller(string userId);
-        //Task<List<OrderView>> GetMyOrdersForSeller(string userId);
-        //Task<List<OrderView>> GetAllOrders();
+        Task<List<OrderView>> GetMyOrdersForSeller(string userId);
+        Task<List<OrderView>> GetAllOrders();
     }
 }

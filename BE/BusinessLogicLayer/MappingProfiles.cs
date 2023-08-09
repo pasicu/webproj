@@ -25,6 +25,10 @@ namespace BusinessLogicLayer
             CreateMap<UpdateUser, UserModel>()
                 .ForMember(dest => dest.ProfilePicture, opt => opt.Ignore());
 
+            CreateMap<UserModel, SellerView>()
+                .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfilePicture == null ? null
+                : $"data:image/jpg;base64,{Convert.ToBase64String(src.ProfilePicture)}"));
+            
             CreateMap<NewProduct, Product>()
                 .ForMember(dest => dest.SellerId, opt => opt.MapFrom(src => new Guid(src.SellerId)))
                 .ForMember(dest => dest.Image, opt => opt.Ignore())

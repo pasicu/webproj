@@ -102,21 +102,21 @@ namespace BusinessLogicLayer.Services
             return mappedUserOrders;
         }
 
-        //public async Task<List<OrderView>> GetAllOrders()
-        //{
-        //    var allOrders = (await _unitOfWork.Orders.GetAll()).ToList();
-        //    var mappedOrders = _mapper.Map<List<OrderView>>(allOrders);
-        //    foreach (var order in mappedOrders)
-        //    {
-        //        var productsInOrder = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToLower()));
-        //        foreach (var differentProduct in productsInOrder)
-        //        {
-        //            order.NumberOfProducts += differentProduct.ProductQuantity;
-        //        }
+        public async Task<List<OrderView>> GetAllOrders()
+        {
+            var allOrders = (await _unitOfWork.Orders.GetAll()).ToList();
+            var mappedOrders = _mapper.Map<List<OrderView>>(allOrders);
+            foreach (var order in mappedOrders)
+            {
+                var productsInOrder = (await _unitOfWork.OrderProducts.GetAll()).Where(op => op.OrderId.ToString().ToLower().Equals(order.Id.ToLower()));
+                foreach (var differentProduct in productsInOrder)
+                {
+                    order.NumberOfProducts += differentProduct.ProductQuantity;
+                }
 
-        //    }
-        //    return mappedOrders;
-        //}
+            }
+            return mappedOrders;
+        }
 
         public async Task<List<OrderView>> GetAllOrdersForSeller(string userId)
         {   //sadrzi product id-eve ovog prodavca
@@ -168,12 +168,12 @@ namespace BusinessLogicLayer.Services
         }
 
 
-        //public async Task<List<OrderView>> GetMyOrdersForSeller(string userId)
-        //{
-        //    var allOrders = await GetAllOrdersForSeller(userId);
-        //    var oldOrders = allOrders.Where(o => DateTime.Parse(o.OrderedAt).AddHours(1) < DateTime.Now && o.OrderCanceled == false).ToList();
-        //    return oldOrders;
-        //}
+        public async Task<List<OrderView>> GetMyOrdersForSeller(string userId)
+        {
+            var allOrders = await GetAllOrdersForSeller(userId);
+            var oldOrders = allOrders.Where(o => DateTime.Parse(o.OrderedAt).AddHours(1) < DateTime.Now && o.OrderCanceled == false).ToList();
+            return oldOrders;
+        }
 
         public async Task<OrderDetailsView> SellerOrderDetails(OrderDetailsInbound orderDetailsInbound)
         {

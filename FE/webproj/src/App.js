@@ -12,6 +12,9 @@ import { UpdateProductForm } from './components/sellerCommands/UpdateProduct';
 import { OldOrders } from './components/buyerCommands/OldOrders';
 import { OrderDetails } from './components/buyerCommands/OrderDetails';
 import { NewOrders } from './components/sellerCommands/NewOrders';
+import { MyOrders } from './components/sellerCommands/MyOrders';
+import { AllOrders } from './components/adminCommands/AllOrders';
+import { VerifyUsers } from './components/adminCommands/VerifyUsers';
 
 
 function App() {
@@ -29,6 +32,10 @@ function App() {
                 element= {<PrivateRoute
                           allowedRoles={["Admin", "Seller", "Buyer"]}
                           component={Dashboard} />} />
+        <Route path="/verify-users"
+                element= {<PrivateRoute
+                          allowedRoles={["Admin"]}
+                          component={VerifyUsers} />} />
         <Route path="/my-products"
                 element={<PrivateRoute
                           allowedRoles={["Seller"]}
@@ -56,7 +63,15 @@ function App() {
         <Route path="/new-orders"
                 element={<PrivateRoute
                           allowedRoles={["Seller"]}
-                          component={NewOrders}/> }/>                                      
+                          component={NewOrders}/> }/>  
+        <Route path="/my-orders"
+                element={<PrivateRoute
+                          allowedRoles={["Seller"]}
+                          component={MyOrders}/> }/> 
+        <Route path="/all-orders"
+                element={<PrivateRoute
+                          allowedRoles={["Admin"]}
+                          component={AllOrders}/> }/>                                   
       </Routes>
     </>
   );

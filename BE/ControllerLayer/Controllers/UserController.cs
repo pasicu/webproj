@@ -47,5 +47,21 @@ namespace ControllerLayer.Controllers
         {
             return Ok(await _userService.UpdateUser(user));
         }
+
+        [HttpPatch]
+        [Route("users/{username}/verify")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> Verify(VerifyUserModel user)
+        {
+            return Ok(await _userService.Verify(user));
+        }
+
+        [HttpGet]
+        [Route("users/sellers")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetSellers()
+        {
+            return Ok(await _userService.GetSellers());
+        }
     }
 }

@@ -6,8 +6,11 @@ using Common.Models.Inbound;
 using Common.Models.Outbound;
 using DatabaseLayer.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using static Common.Constants;
@@ -18,11 +21,13 @@ namespace BusinessLogicLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IMapper mapper, IUnitOfWork unitOfWork)
+        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
         }
 
         public async Task<UserModel> CreateUser(RegisterUser incomingUser)
@@ -108,6 +113,40 @@ namespace BusinessLogicLayer.Services
                 updatedUser.ProfilePicture = await ParseProfilePictureToString(userUpdatedValues.ProfilePicture);
 
             return updatedUser;
+        }
+
+        public async Task<string> Verify(VerifyUserModel user)
+        {
+            var existingUser = await _unitOfWork.Users.FindAsync(u => u.Username.Equals(user.Username));
+            if (existingUser == null)
+                throw new Exception("There is no user with the given username.");
+            existingUser.Verified = user.Value;
+
+            await _unitOfWork.Users.Update(existingUser, existingUser.Id);
+            await _unitOfWork.SaveChanges();
+
+            SendVerificationEmail(existingUser.Email);
+
+            return existingUser.Username;
+        }
+
+        public async Task<List<SellerView>> GetSellers()
+        {
+            var sellersInDatabase = _unitOfWork.Users.GetAll().Result.Where(u => u.UserType == UserType.Seller).OrderBy(u => u.Verified).ToList();
+            var sellersAdapted = _mapper.Map<List<SellerView>>(sellersInDatabase);
+            List<SellerView> sellersSorted = new List<SellerView>();
+            sellersSorted.AddRange(sellersAdapted);
+            foreach (var seller in sellersSorted)
+            {
+                if (seller.Verified == null)        //stavljanje odbijenih zahteva za verifikaciju na kraj liste
+                {
+                    var tempSeller = seller;
+                    sellersAdapted.Remove(seller);
+                    sellersAdapted.Add(tempSeller);
+                }
+            } 
+
+            return sellersAdapted;
         }
 
         #region private methods
@@ -243,6 +282,20 @@ namespace BusinessLogicLayer.Services
             sb.Insert(18, '-');
             sb.Insert(23, '-');
             return Task.FromResult(sb.ToString());
+        }
+
+        private void SendVerificationEmail(string email)
+        {
+            var senderEmail = _configuration.GetValue<string>("MailServiceCredentials:Email");
+            var password = _configuration.GetValue<string>("MailServiceCredentials:Password");
+            var stmpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(senderEmail, password),
+                EnableSsl = true
+            };
+
+            stmpClient.Send(senderEmail, email, "Verifcation", "Admin has reviewed your verification request, log in to check it.");
         }
 
         #endregion private methods
